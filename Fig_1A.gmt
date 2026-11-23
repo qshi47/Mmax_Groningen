@@ -1,0 +1,135 @@
+fig_path=./data/data_Fig1/v3
+thicknessfile=./data/data_Fig1/ReservoirThickness.nc
+faults_trace=./data/data_Fig1/Faults_lon_lat.gmt
+topogradfile=./data/data_Fig1/Groningen_topo_gradient.nc
+cmap_thickness=./data/data_Fig1/cmap_thickness.cpt
+cmap_grad=./data/data_Fig1/cmap_grad.cpt
+cmap_fm=./ge177/map2_fm.cpt
+KNMI_catalog=./data/data_Fig1/KNMI_CAT_lon_lat_size.txt
+Willacy_catalog=./data/data_Fig1/Willacy_lon_lat_depth_sdr_size.txt
+cross_section=./data/data_Fig1/Willacy/cross_section.txt
+leg=./data/data_Fig1/v2.legend
+legscale=./data/data_Fig1/v2.legendscale
+
+JR="-JM18i -R6.5/7.22/53.08/53.5" # -R6.5/7.28/53.0/53.5
+dpi=400
+
+
+legformat="-DJTR+o-5.5i/-5.0i+w5.4i/4.9i -F+gwhite+p2p,black+r6p+c0.12i" #-F+p2p+gwhite@70"
+legscaleformat="-DjBR+o0.1i/0.1i+w4i/1.8i" #-F+gwhite+p2p,black+r6p+c0.12i
+insetformat="-DjBL++o0.03i/0.03i+w3.54i/3.46i -F+p3p,black+r6p+c0.04i" # o0.01i/0.01i+w3.54i/3.46i #o0.01i/0.01i+w5i/5.35i -F+gwhite+p4p,black+r6p+c0.12i
+
+
+# pen styles for the map and legend
+pcoast="0.75p,black"  # coastlines
+pnatborders="1.5p,black"  # national borders
+privers="1p,blue"  # rivers
+pfaults="1p,darkred"  # faults
+proads="1p,50"  # roads
+pOutline="3p,orange" # outline of reservoir
+
+cat > $leg << EOF
+# H 36p - Sumatra Trench
+# H 36p - Focal Mechanism (2000-2013, Mw > 2)
+# G 0.3
+# D 0.25p
+
+# G 0.2
+# S 1.5 - 1 - $pcoast 2.5 Coast Line
+# S 1.5 - 1 - $pOutline 2.5 Reservoir Outline
+# G 0.2
+
+# D 0.25p
+
+G 0.3
+L 36p - C Reservoir Thickness (m)
+G 0.2
+B $cmap_thickness 0.5 0.5 -Bx100f150 -I0.5
+G 0.2
+
+# D 0.25p
+# G 0.2
+# S 0.5 c 12p - 1.0p,black 1.5 KNMI Catalog
+# L 36p - R (1991/12 - 2023/01)
+# G 0.1
+# S 0.5 kmeca 12p black 1p,black 1.5 Willacy Catalog
+# L 36p - R (2018/01 - 2022/10)
+# G 0.2
+
+D 0.25p
+G 0.2
+
+S 1.5 c 3.0p - 1.0p,black 2.5 M 1.0
+
+G 0.1
+S 1.5 c 12.0p - 1.0p,black 2.5 M 2.0
+
+G 0.1
+S 1.5 c 27.0p - 1.0p,black 2.5 M 3.0
+
+EOF
+
+cat > $legscale << EOF
+
+# D 0.25p
+L 36p - C km
+G -0.2
+M - 0 10+f$JR
+EOF
+#+l10km
+
+# gmt set FONT_ANNOT_PRIMARY 24p
+# gmt set HEADER_FONT_SIZE 22 LABEL_FONT_SIZE 22 MEASURE_UNIT inch PLOT_DEGREE_FORMAT D
+# gmt set PS_MEDIA A4
+
+# gmt set MAP_FRAME_TYPE fancy
+gmt set MAP_FRAME_TYPE plain
+gmt set FONT_ANNOT_PRIMARY 36p
+gmt set LABEL_FONT_SIZE 36p
+gmt set HEADER_FONT_SIZE 36p
+gmt set MAP_TICK_LENGTH_PRIMARY 0.15i
+gmt set MAP_FRAME_PEN 2p,black
+
+gmt begin ${fig_path} png E${dpi}
+gmt basemap $JR -Bxa0.2f0.2 -Bya0.1f0.1 -BWSen+gwhite #+w20p,black
+
+# Background topography removed per v3 requirements
+# gmt grdimage  @earth_relief_03s  -E${dpi} -C$cmap_grad $JR -t0 #-I+d
+gmt coast   -W1/$pcoast -Ir/$privers -Slightblue  -C- -t0 $JR # -N1/$pnatborders
+
+gmt plot ${faults_trace} -W1p,gray50@30
+
+gmt clip ./data/data_Fig1/ReservoirOutline_lonlat.txt $JR
+    gmt grdimage $thicknessfile -C$cmap_thickness -t10 $JR
+    gmt plot ${faults_trace} -W1p,gray50@10
+    gmt plot  $JR -Scp  -W1p,black < ${KNMI_catalog}
+    gmt meca  $JR -Sa5p -W1p,black < ${Willacy_catalog} -t30
+gmt clip -C $JR
+
+
+gmt plot ./data/data_Fig1/ReservoirOutline_lonlat.txt -W$pOutline
+gmt set MAP_FRAME_PEN 0.1p,black
+
+gmt inset begin $insetformat
+    gmt basemap -R3/9/50.4/54 -JM? -Bwsen  #-R3/9/50/54
+    gmt coast -Ggray100 -Slightblue -W1/1p,black -N1/1p,black -Ir/1.5p,lightblue # -Glightyellow
+    gmt plot ./data/data_Fig1/ReservoirOutline_lonlat.txt -Gorange -W"1p,orange" #-W$pOutline
+    gmt text -R3/9/50.4/54 -JM? -F+f14p,Helvetica-Bold,black+jCM << LABELS
+5.5 52.1 Netherlands
+7.5 51.5 Germany
+4.5 50.8 Belgium
+LABELS
+gmt inset end
+
+gmt set MAP_FRAME_PEN 1p,black
+
+gmt legend $legformat < $leg
+gmt legend $legscaleformat < $legscale
+
+# cross section 
+gmt plot ${cross_section} -W2p,red,- -t50
+# gmt plot ${cross_section} -Sc0.18c -Gred -W0.5p
+
+# Redraw the basemap frame on top so it is not covered by coast/inset/legend
+gmt basemap $JR -Bxa0.2f0.2 -Bya0.1f0.1 -BWSen
+gmt end
