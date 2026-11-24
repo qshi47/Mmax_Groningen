@@ -3,9 +3,9 @@ This repository provides the code for the PNAS paper
 
 **Conditions for runaway ruptures during reservoir operations: Magnitude–frequency distribution implications and application to Groningen** 
 
-by Qian Shi\*, Alexis Sáez, Linxuan Li, Kyungjae Im, Stephen Bourne, Jan van Elk, and Jean-Philippe Avouac\*.
+by Qian Shi\*, Alexis Sáez, Linxuan Li, Kyungjae Im, Stephen Bourne, Jan van Elk, and Jean-Philippe Avouac\*
 
-*Proceedings of the National Academy of Sciences* **123**(48), e2625955123 (2026), [doi:10.1073/pnas.2625955123.](https://doi.org/10.1073/pnas.2625955123) [(Supporting information)](https://www.pnas.org/doi/10.1073/pnas.2625955123#supplementary-materials)
+*Proceedings of the National Academy of Sciences* **123** (48), e2625955123 (2026), [doi:10.1073/pnas.2625955123](https://doi.org/10.1073/pnas.2625955123) ([Supporting information](https://www.pnas.org/doi/10.1073/pnas.2625955123#supplementary-materials)).
 
 
 ## Introduction
